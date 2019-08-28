@@ -1,2 +1,2 @@
 # parralax-multi-layered
-Multiple layerd images parralax
+Multiple layered images parralax
