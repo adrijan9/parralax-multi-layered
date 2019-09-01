@@ -1,11 +1,16 @@
 import Element from "../../Modules/Html/Element";
 import ParralaxItems from "./ParralaxItems";
+import Errors from "../../Constants/Errors";
 
 class ParralaxWindow {
     static create(app){
         app.heroHeight = ParralaxWindow.getHeight(app);
-        console.log(app._content);
         app._content.style.top = app.heroHeight;
+        app.generatedItems = ParralaxItems.items(app);
+
+        if(app.generatedItems.length === 0){
+            console.warn(Errors.NO_ITEMS_WARNING);
+        }
 
         return Element.create(
             "div",
@@ -22,7 +27,7 @@ class ParralaxWindow {
                         height: app.heroHeight
                     }
                 },
-                ParralaxItems.items(app)
+                app.generatedItems
             )
         );
     }
@@ -41,6 +46,10 @@ class ParralaxWindow {
         }
 
         return `${defaultHeight}px`;
+    }
+
+    static onResize(app){
+
     }
 }
 
