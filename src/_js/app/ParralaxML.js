@@ -7,10 +7,12 @@ class ParallaxML {
     constructor(config = {}){
         this.windowWidth = window.innerWidth;
         this._config = config || {};
-        this._layers = config.layers || [];
+        this._layers = config.layers || {};
+        this._layers.items = this._layers.items || [];
+        this._scrollable = typeof this._layers.scrollable === "undefined" ? true : this._layers.scrollable;
         this._style = config.style || {};
         this._style.responsive = this._style.responsive || [];
-        this._style.layer = this._style.layer || {};
+        this._style.responsive = this._style.responsive.sort((a, b) => a.screen - b.screen);
 
         this._container = this.container();
         if(!this._container){
@@ -25,6 +27,7 @@ class ParallaxML {
         this._container.insertBefore(ParralaxWindow.create(this), this._container.childNodes[0]);
 
         this.onResize(this);
+        this.onScroll(this);
     }
 
     container(){
@@ -46,13 +49,42 @@ class ParallaxML {
     }
 
     onResize(app){
-        let resize = false;
+        let resize = false,
+            currentBreakpoint = {
+                screen: 0
+            };
+
         window.onresize = () => {
+            let windowWidth = window.innerWidth;
+            for (let i = 0; i < app._style.responsive.length; i++) {
+                let testPoint = app._style.responsive[i],
+                    nextPoint = app._style.responsive[(i + 1)];
+
+                nextPoint = typeof nextPoint === "undefined" ?
+                    app._style.responsive[(app._style.responsive.length - 1)] :
+                    nextPoint;
+
+                if(windowWidth >= testPoint.screen && windowWidth <= nextPoint.screen){
+                    if(testPoint.screen !== currentBreakpoint.screen){
+                        currentBreakpoint = testPoint;
+                    }
+                }
+            }
+
+
             clearTimeout(resize);
             resize = setTimeout(() => {
+                app.currentBreakpoint = currentBreakpoint;
+
                 ParralaxWindow.onResize(app);
             }, 250);
         }
+    }
+
+    onScroll(app){
+        window.addEventListener('scroll', function (event) {
+            ParralaxWindow.onScroll(app, this.pageYOffset);
+        });
     }
 }
 

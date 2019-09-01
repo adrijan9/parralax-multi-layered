@@ -1,6 +1,7 @@
 import Element from "../../Modules/Html/Element";
 import ParralaxItems from "./ParralaxItems";
 import Errors from "../../Constants/Errors";
+import Attributes from "../../Constants/Attributes";
 
 class ParralaxWindow {
     static create(app){
@@ -12,24 +13,28 @@ class ParralaxWindow {
             console.warn(Errors.NO_ITEMS_WARNING);
         }
 
-        return Element.create(
+        app.parralaxWindowHero = Element.create(
+            "div",
+            {
+                id: "hero",
+                classList: "hero",
+                style: {
+                    height: app.heroHeight
+                }
+            },
+            app.generatedItems
+        );
+
+        app.parralaxWindow = Element.create(
             "div",
             {
                 id: "hero-container",
                 classList: "hero-container"
             },
-            Element.create(
-                "div",
-                {
-                    id: "hero",
-                    classList: "hero",
-                    style: {
-                        height: app.heroHeight
-                    }
-                },
-                app.generatedItems
-            )
+            app.parralaxWindowHero
         );
+
+        return app.parralaxWindow;
     }
 
     static getHeight(app){
@@ -49,7 +54,27 @@ class ParralaxWindow {
     }
 
     static onResize(app){
+        app.parralaxWindowHero.style.height = `${app.currentBreakpoint.height}px`;
+        app._content.style.top = `${app.currentBreakpoint.height}px`;
+    }
 
+    static onScroll(app, pageYOffset){
+        let items = app.generatedItems;
+
+        if(items.length && app._scrollable){
+            for (let i = 0; i < items.length; i++) {
+                let layer = items[i],
+                    depth = Number(layer.getAttribute(Attributes.DEPTH_ATTRIBUTE)),
+                    movement = -(pageYOffset * depth),
+                    translate3d = `translate3d(0, ${movement}px, 0)`;
+
+                layer.style['-webkit-transform'] = translate3d;
+                layer.style['-moz-transform'] = translate3d;
+                layer.style['-ms-transform'] = translate3d;
+                layer.style['-o-transform'] = translate3d;
+                layer.style.transform = translate3d;
+            }
+        }
     }
 }
 

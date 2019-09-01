@@ -1,10 +1,11 @@
 import Element from "../../Modules/Html/Element";
+import Classes from "../../Constants/Classes";
 
 class ParralaxItem {
     static create(data, height){
         const { id, depth, background, position } = data;
         let style = {
-            height: height,
+            "height": height,
             "background-image": `url(${background})`
         };
 
@@ -16,7 +17,7 @@ class ParralaxItem {
             "div",
             {
                 id: `item-${id}`,
-                classList: "layer",
+                classList: Classes.LAYER_CLASS,
                 style: style,
                 depth: depth
             },
